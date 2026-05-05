@@ -1,0 +1,60 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+<link rel="icon" href="data:,">
+  <title>Schism Tracker</title>
+  <style>
+    * { margin: 0; padding: 0; }
+    body { background: #000; }
+    canvas { display: block; }
+    #overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: #000; display: flex; align-items: center;
+      justify-content: center; z-index: 999; cursor: pointer;
+    }
+    #overlay div {
+      color: #0f0; font-family: monospace; font-size: 24px;
+      border: 2px solid #0f0; padding: 20px 40px; text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="overlay"><div>▶ Click to Start Schism Tracker</div></div>
+  <canvas id="canvas"></canvas>
+  <script>
+    var Module = {
+      canvas: document.getElementById('canvas'),
+      print: function(t) { console.log(t); },
+      printErr: function(t) { console.error(t); },
+    };
+
+    document.getElementById('overlay').addEventListener('click', function() {
+      this.remove();
+      if (typeof SDL2 !== 'undefined' && SDL2.audioContext) {
+        SDL2.audioContext.resume();
+      }
+    });
+
+    // Drag and drop file loading
+    document.addEventListener('dragover', function(e) { e.preventDefault(); });
+    document.addEventListener('drop', function(e) {
+      e.preventDefault();
+      var file = e.dataTransfer.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(ev) {
+        var data = new Uint8Array(ev.target.result);
+        var path = '/home/web_user/' + file.name;
+        FS.writeFile(path, data);
+        console.log('Loaded: ' + path);
+        // Tell Schism to load it via command line arg simulation
+        // or just write to a known location
+      };
+      reader.readAsArrayBuffer(file);
+    });
+  </script>
+  <script src="schismtracker.js"></script>
+</body>
+</html>
